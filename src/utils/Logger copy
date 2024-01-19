@@ -1,0 +1,56 @@
+
+import { createLogger, transports, format, Logger } from "winston";
+import appRoot from 'app-root-path';
+
+export class Log {
+
+    winstonLogger: Logger;
+
+    constructor() {
+        this.winstonLogger = createLogger({
+            transports: [
+                new transports.File({
+                    level: 'debug',
+                    filename: `${appRoot}/logs/all-logs.log`,
+                    handleExceptions: true,
+                    maxsize: 5242880, // 5MB
+                    maxFiles: 5,
+                }),
+                new transports.Console({
+                    level: 'debug',
+                    handleExceptions: true,
+                })
+            ],
+            format: format.combine(
+                format.colorize(),
+                format.timestamp(),
+                format.printf(({ timestamp, level, message }) => {
+                    return `[${timestamp}] ${level}: ${message}`;
+                })
+            ),
+            exitOnError: false
+        });
+
+    }
+
+    public error(file: String, nameFunction: String, message: String) {
+        var data = { timestamp: new Date(), file: file, function: nameFunction, message: message };
+        this.winstonLogger.error(data);
+    };
+
+    public warn(file: String, nameFunction: String, message: String) {
+        var data = { timestamp: new Date(), file: file, function: nameFunction, message: message };
+        this.winstonLogger.warn(data);
+    }
+
+    public info(file: String, nameFunction: String, message: String) {
+        var data = { timestamp: new Date(), file: file, function: nameFunction, message: message };
+        this.winstonLogger.info(data);
+    }
+
+    public debug(file: String, nameFunction: String, message: String) {
+        var data = { timestamp: new Date(), file: file, function: nameFunction, message: message };
+        this.winstonLogger.debug(data);
+    }
+
+}
